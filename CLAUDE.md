@@ -48,6 +48,15 @@ This includes, but is not limited to:
 - Major refactors
 Never assume these decisions without discussing them with me first.
 
+## Validation
+
+After every change:
+
+- Verify that the implementation works as expected.
+- Run the appropriate tests whenever possible.
+- Ensure no existing functionality has been broken.
+- Fix any issues before considering the task complete.
+
 
 ## Communication
 
