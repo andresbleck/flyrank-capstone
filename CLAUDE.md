@@ -86,3 +86,4 @@ After every change:
 - If multiple valid approaches exist, present the pros and cons of each.
 - Don't make assumptions about my intentions.
 - Ask clarifying questions whenever requirements are unclear.
+@AGENTS.md
