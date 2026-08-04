@@ -6,14 +6,14 @@ web applications.
 
 ## Tech Stack
 
+- Next.js (App Router)
 - React
 - TypeScript
-- Vite
 - Tailwind CSS
 
 ## Getting Started
 
-**Prerequisites:** Node.js 18+
+**Prerequisites:** Node.js 20.9+
 
 ```bash
 git clone https://github.com/andresbleck/flyrank-capstone.git
@@ -22,7 +22,7 @@ npm install
 npm run dev
 ```
 
-The app runs at `http://localhost:5173` by default.
+The app runs at `http://localhost:3000` by default.
 
 ## License
 
