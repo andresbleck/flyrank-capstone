@@ -1,3 +1,4 @@
+import type { GroqLanguageModelChatOptions } from "@ai-sdk/groq";
 import {
   convertToModelMessages,
   createUIMessageStreamResponse,
@@ -16,6 +17,14 @@ export async function POST(req: Request) {
     model: aiCoachModel,
     system: AI_COACH_SYSTEM_PROMPT,
     messages: await convertToModelMessages(messages),
+    // Qwen3 models emit their chain-of-thought as a literal <think> block in
+    // the text output unless told otherwise — "hidden" strips it so only the
+    // user-facing answer streams to the chat.
+    providerOptions: {
+      groq: {
+        reasoningFormat: "hidden",
+      } satisfies GroqLanguageModelChatOptions,
+    },
   });
 
   return createUIMessageStreamResponse({

@@ -14,13 +14,17 @@ import {
 type ChatInputFormProps = {
   onSubmit: (content: string) => void;
   onStop: () => void;
+  onResume: () => void;
   isStreaming: boolean;
+  isPaused: boolean;
 };
 
 export function ChatInputForm({
   onSubmit,
   onStop,
+  onResume,
   isStreaming,
+  isPaused,
 }: ChatInputFormProps) {
   const {
     register,
@@ -66,6 +70,15 @@ export function ChatInputForm({
             className="absolute right-2 top-1/2 -translate-y-1/2"
           >
             Stop
+          </Button>
+        ) : isPaused ? (
+          <Button
+            type="button"
+            onClick={onResume}
+            variant="danger"
+            className="absolute right-2 top-1/2 -translate-y-1/2"
+          >
+            Resume
           </Button>
         ) : (
           <Button

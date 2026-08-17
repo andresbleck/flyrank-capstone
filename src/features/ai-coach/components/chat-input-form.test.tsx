@@ -10,7 +10,13 @@ describe("ChatInputForm", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(
-      <ChatInputForm onSubmit={onSubmit} onStop={vi.fn()} isStreaming={false} />,
+      <ChatInputForm
+        onSubmit={onSubmit}
+        onStop={vi.fn()}
+        onResume={vi.fn()}
+        isStreaming={false}
+        isPaused={false}
+      />,
     );
 
     const textbox = screen.getByRole("textbox");
@@ -26,7 +32,13 @@ describe("ChatInputForm", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(
-      <ChatInputForm onSubmit={onSubmit} onStop={vi.fn()} isStreaming={false} />,
+      <ChatInputForm
+        onSubmit={onSubmit}
+        onStop={vi.fn()}
+        onResume={vi.fn()}
+        isStreaming={false}
+        isPaused={false}
+      />,
     );
 
     await user.click(screen.getByRole("button", { name: "Send" }));
@@ -40,7 +52,13 @@ describe("ChatInputForm", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(
-      <ChatInputForm onSubmit={onSubmit} onStop={vi.fn()} isStreaming={false} />,
+      <ChatInputForm
+        onSubmit={onSubmit}
+        onStop={vi.fn()}
+        onResume={vi.fn()}
+        isStreaming={false}
+        isPaused={false}
+      />,
     );
 
     await user.type(screen.getByRole("textbox"), "     ");
@@ -54,7 +72,13 @@ describe("ChatInputForm", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(
-      <ChatInputForm onSubmit={onSubmit} onStop={vi.fn()} isStreaming={false} />,
+      <ChatInputForm
+        onSubmit={onSubmit}
+        onStop={vi.fn()}
+        onResume={vi.fn()}
+        isStreaming={false}
+        isPaused={false}
+      />,
     );
 
     const tooLong = "a".repeat(AI_COACH_MAX_MESSAGE_LENGTH + 1);
@@ -69,7 +93,13 @@ describe("ChatInputForm", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(
-      <ChatInputForm onSubmit={onSubmit} onStop={vi.fn()} isStreaming={false} />,
+      <ChatInputForm
+        onSubmit={onSubmit}
+        onStop={vi.fn()}
+        onResume={vi.fn()}
+        isStreaming={false}
+        isPaused={false}
+      />,
     );
 
     const textbox = screen.getByRole("textbox");
@@ -82,7 +112,13 @@ describe("ChatInputForm", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(
-      <ChatInputForm onSubmit={onSubmit} onStop={vi.fn()} isStreaming={false} />,
+      <ChatInputForm
+        onSubmit={onSubmit}
+        onStop={vi.fn()}
+        onResume={vi.fn()}
+        isStreaming={false}
+        isPaused={false}
+      />,
     );
 
     const textbox = screen.getByRole("textbox");
@@ -96,7 +132,15 @@ describe("ChatInputForm", () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     const onStop = vi.fn();
-    render(<ChatInputForm onSubmit={onSubmit} onStop={onStop} isStreaming />);
+    render(
+      <ChatInputForm
+        onSubmit={onSubmit}
+        onStop={onStop}
+        onResume={vi.fn()}
+        isStreaming
+        isPaused={false}
+      />,
+    );
 
     const textbox = screen.getByRole("textbox");
     expect(textbox).toBeDisabled();
@@ -108,6 +152,32 @@ describe("ChatInputForm", () => {
     await user.click(stopButton);
 
     expect(onStop).toHaveBeenCalledOnce();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("shows a red Resume button instead of Send while paused, and calls onResume on click", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    const onResume = vi.fn();
+    render(
+      <ChatInputForm
+        onSubmit={onSubmit}
+        onStop={vi.fn()}
+        onResume={onResume}
+        isStreaming={false}
+        isPaused
+      />,
+    );
+
+    expect(screen.queryByRole("button", { name: "Send" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Stop" })).not.toBeInTheDocument();
+
+    const resumeButton = screen.getByRole("button", { name: "Resume" });
+    expect(resumeButton).toHaveClass("bg-red-600");
+
+    await user.click(resumeButton);
+
+    expect(onResume).toHaveBeenCalledOnce();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 });

@@ -5,6 +5,7 @@ import type { UIMessage } from "ai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AiCoachChat } from "@/features/ai-coach/components/ai-coach-chat";
+import { AI_COACH_RESUME_MESSAGE } from "@/features/ai-coach/constants";
 import {
   persistMessages,
   readStoredMessages,
@@ -98,6 +99,28 @@ describe("AiCoachChat", () => {
     await user.click(stopButton);
 
     expect(stop).toHaveBeenCalledOnce();
+  });
+
+  it("shows a red Resume button after Stop, and resuming asks the model to continue", async () => {
+    const user = userEvent.setup();
+    mockUseChat({ messages: [userMessage], status: "streaming" });
+
+    const { rerender } = render(<AiCoachChat />);
+    await user.click(screen.getByRole("button", { name: "Stop" }));
+    expect(stop).toHaveBeenCalledOnce();
+
+    // Simulate the stream having actually stopped after the abort.
+    mockUseChat({ messages: [userMessage], status: "ready" });
+    rerender(<AiCoachChat />);
+
+    const resumeButton = screen.getByRole("button", { name: "Resume" });
+    expect(resumeButton).toHaveClass("bg-red-600");
+
+    await user.click(resumeButton);
+
+    expect(sendMessage).toHaveBeenCalledExactlyOnceWith({
+      text: AI_COACH_RESUME_MESSAGE,
+    });
   });
 
   it("sends the typed message through useChat's sendMessage", async () => {

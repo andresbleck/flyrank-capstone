@@ -2,9 +2,12 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { AI_COACH_API_PATH } from "@/features/ai-coach/constants";
+import {
+  AI_COACH_API_PATH,
+  AI_COACH_RESUME_MESSAGE,
+} from "@/features/ai-coach/constants";
 import { ChatInputForm } from "@/features/ai-coach/components/chat-input-form";
 import { ChatMessageList } from "@/features/ai-coach/components/chat-message-list";
 import {
@@ -20,6 +23,26 @@ export function AiCoachChat() {
   const isStreaming = status === "submitted" || status === "streaming";
   const isWaitingForReply = status === "submitted";
   const lastAssistantMessageRef = useRef<HTMLDivElement>(null);
+
+  // Tracks "stopped mid-answer, can be resumed" — distinct from isStreaming
+  // so the input area can show a Resume button instead of falling back to
+  // Send once the stream stops.
+  const [isPaused, setIsPaused] = useState(false);
+
+  const handleSubmit = (content: string) => {
+    setIsPaused(false);
+    sendMessage({ text: content });
+  };
+
+  const handleStop = () => {
+    stop();
+    setIsPaused(true);
+  };
+
+  const handleResume = () => {
+    setIsPaused(false);
+    sendMessage({ text: AI_COACH_RESUME_MESSAGE });
+  };
 
   // Runs client-only, after hydration, to avoid a server/client mismatch
   // (the server render never has access to localStorage).
@@ -68,8 +91,10 @@ export function AiCoachChat() {
       <div className="border-t border-white/10 bg-black/40 p-4 backdrop-blur-sm">
         <ChatInputForm
           isStreaming={isStreaming}
-          onSubmit={(content) => sendMessage({ text: content })}
-          onStop={stop}
+          isPaused={isPaused}
+          onSubmit={handleSubmit}
+          onStop={handleStop}
+          onResume={handleResume}
         />
       </div>
     </div>
