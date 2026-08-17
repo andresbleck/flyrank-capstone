@@ -1,5 +1,5 @@
+import { AiCoachChat } from "@/features/ai-coach/components/ai-coach-chat";
+
 export default function AiCoach() {
-  return (
-    <h1 className="p-6 text-2xl font-semibold">This is the AI Coach page</h1>
-  );
+  return <AiCoachChat />;
 }
