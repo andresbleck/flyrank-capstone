@@ -10,6 +10,13 @@ import {
 import { AI_COACH_SYSTEM_PROMPT } from "@/features/ai-coach/constants";
 import { aiCoachModel } from "@/features/ai-coach/lib/groq-provider";
 
+// Without this, Vercel applies its platform default execution limit, which
+// can be shorter than a long streamed answer takes to finish — cutting the
+// response off mid-sentence instead of a clean completion. Vercel caps this
+// to whatever the project's plan allows, so it's safe to ask for more than
+// necessary.
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 

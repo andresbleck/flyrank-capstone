@@ -7,8 +7,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AiCoachChat } from "@/features/ai-coach/components/ai-coach-chat";
 import { AI_COACH_RESUME_MESSAGE } from "@/features/ai-coach/constants";
 import {
+  ArchivedConversation,
   persistMessages,
+  persistName,
+  readArchivedConversations,
   readStoredMessages,
+  readStoredName,
+  startNewConversation,
+  switchToConversation,
 } from "@/features/ai-coach/hooks/use-chat-local-storage";
 
 vi.mock("@ai-sdk/react", () => ({
@@ -18,6 +24,11 @@ vi.mock("@ai-sdk/react", () => ({
 vi.mock("@/features/ai-coach/hooks/use-chat-local-storage", () => ({
   readStoredMessages: vi.fn(() => []),
   persistMessages: vi.fn(),
+  readStoredName: vi.fn(() => null),
+  persistName: vi.fn(),
+  startNewConversation: vi.fn(),
+  readArchivedConversations: vi.fn(() => []),
+  switchToConversation: vi.fn(),
 }));
 
 const sendMessage = vi.fn();
@@ -56,6 +67,92 @@ describe("AiCoachChat", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(readStoredMessages).mockReturnValue([]);
+    // Most tests exercise the chat itself, not the name gate — default to a
+    // conversation that already has a name, same as a returning visitor.
+    vi.mocked(readStoredName).mockReturnValue("Andres");
+    vi.mocked(readArchivedConversations).mockReturnValue([]);
+  });
+
+  it("asks for a name before showing the chat when none is stored yet", () => {
+    vi.mocked(readStoredName).mockReturnValue(null);
+    mockUseChat({ status: "ready" });
+
+    render(<AiCoachChat />);
+
+    expect(screen.getByLabelText(/what's your name/i)).toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "New conversation" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("reveals the chat and remembers the name once the name gate is submitted", async () => {
+    const user = userEvent.setup();
+    vi.mocked(readStoredName).mockReturnValue(null);
+    mockUseChat({ status: "ready" });
+
+    render(<AiCoachChat />);
+    await user.type(screen.getByLabelText(/what's your name/i), "Andres");
+    await user.click(screen.getByRole("button", { name: "Start chatting" }));
+
+    expect(persistName).toHaveBeenCalledExactlyOnceWith("Andres");
+    expect(
+      screen.getByPlaceholderText("Ask your AI coach anything..."),
+    ).toBeInTheDocument();
+  });
+
+  it("archives the current conversation and returns to the name gate on New conversation", async () => {
+    const user = userEvent.setup();
+    mockUseChat({ messages: [userMessage, assistantMessage], status: "ready" });
+
+    render(<AiCoachChat />);
+    await user.click(screen.getByRole("button", { name: "New conversation" }));
+
+    expect(startNewConversation).toHaveBeenCalledExactlyOnceWith("Andres", [
+      userMessage,
+      assistantMessage,
+    ]);
+    expect(setMessages).toHaveBeenCalledWith([]);
+    expect(screen.getByLabelText(/what's your name/i)).toBeInTheDocument();
+  });
+
+  it("shows the History menu once there are archived conversations, and switching restores the selected one", async () => {
+    const user = userEvent.setup();
+    const archivedLucas: ArchivedConversation = {
+      id: "abc",
+      name: "Lucas",
+      messages: [userMessage],
+      endedAt: "2026-08-17T12:00:00.000Z",
+    };
+    vi.mocked(readArchivedConversations).mockReturnValue([archivedLucas]);
+    vi.mocked(switchToConversation).mockReturnValue({
+      name: "Lucas",
+      messages: [userMessage],
+    });
+    mockUseChat({ messages: [], status: "ready" });
+
+    render(<AiCoachChat />);
+    await user.click(screen.getByRole("button", { name: "History" }));
+    await user.click(screen.getByText("Lucas"));
+
+    expect(switchToConversation).toHaveBeenCalledExactlyOnceWith(
+      "abc",
+      "Andres",
+      [],
+    );
+    // setMessages also fires once on mount (hydration from localStorage),
+    // so this checks the switch call happened rather than call count.
+    expect(setMessages).toHaveBeenCalledWith([userMessage]);
+  });
+
+  it("does not show the History menu when there is nothing archived", () => {
+    mockUseChat({ status: "ready" });
+
+    render(<AiCoachChat />);
+
+    expect(
+      screen.queryByRole("button", { name: "History" }),
+    ).not.toBeInTheDocument();
   });
 
   it("renders each message and moves focus to the last assistant reply once ready", () => {

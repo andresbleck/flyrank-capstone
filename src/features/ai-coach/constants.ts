@@ -30,6 +30,14 @@ Format plans with nested Markdown lists (headings, bullets, bold), never with ta
 
 export const AI_COACH_LOCAL_STORAGE_KEY = "ai-coach:messages";
 
+// Holds the name given for the conversation that's currently active.
+export const AI_COACH_NAME_STORAGE_KEY = "ai-coach:name";
+
+// Conversations archived by "New conversation" — kept locally only, so
+// different people sharing the same browser/device don't see each other's
+// history, and each named conversation stays separate. No backend involved.
+export const AI_COACH_ARCHIVE_STORAGE_KEY = "ai-coach:archived-conversations";
+
 // Sent as a regular user message when Resume is clicked after Stop, so the
 // model keeps writing the same answer instead of starting a new one. This
 // shows up as a normal chat bubble — there's no hidden-message plumbing.
@@ -38,3 +46,6 @@ export const AI_COACH_RESUME_MESSAGE =
 
 // Caps how much a single message can cost to generate a response for.
 export const AI_COACH_MAX_MESSAGE_LENGTH = 2000;
+
+// Caps the name asked for at the start of each conversation.
+export const AI_COACH_MAX_NAME_LENGTH = 50;
