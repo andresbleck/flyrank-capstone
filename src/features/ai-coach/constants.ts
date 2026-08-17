@@ -6,10 +6,12 @@
 
 export const AI_COACH_API_PATH = "/api/ai-coach";
 
-// llama-3.3-70b-versatile: Groq's general-purpose chat model. Chosen for a
-// good balance of response quality and latency for a conversational coach —
-// see console.groq.com/docs/models for other options if this needs revisiting.
-export const AI_COACH_MODEL_ID = "llama-3.3-70b-versatile";
+// openai/gpt-oss-120b: general-purpose open-weight chat model hosted on Groq.
+// Originally used llama-3.3-70b-versatile, but Groq retired it from this
+// account's model catalog — check the Playground's model dropdown at
+// console.groq.com if this ever 404s again ("model does not exist or you
+// do not have access to it" means the catalog changed, not a code bug).
+export const AI_COACH_MODEL_ID = "openai/gpt-oss-120b";
 
 // Instructs the model to gather the user's goal/weight/height/activity level
 // before recommending a plan, instead of answering generically on the first
