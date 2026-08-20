@@ -139,7 +139,9 @@ export function AiCoachChat() {
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/60" />
       <header className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <div>
-          <h1 className="text-lg font-semibold text-white">AI Coach</h1>
+          <h1 className="font-[family-name:var(--font-changa-one)] text-xl tracking-tight text-orange-500 uppercase">
+            AI Coach
+          </h1>
           <p className="text-sm text-gray-300">
             Your personal training and habits assistant
           </p>
@@ -153,7 +155,8 @@ export function AiCoachChat() {
             <Button
               type="button"
               onClick={handleNewConversation}
-              className="shrink-0 bg-white/10 px-3 py-1.5 text-xs hover:bg-white/20"
+              variant="outline"
+              className="shrink-0 bg-orange-500! px-3 py-1.5 font-[family-name:var(--font-baloo-2)] text-xs font-semibold text-white! hover:bg-orange-600!"
             >
               New conversation
             </Button>

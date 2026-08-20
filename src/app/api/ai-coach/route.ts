@@ -9,6 +9,7 @@ import {
 
 import { AI_COACH_SYSTEM_PROMPT } from "@/features/ai-coach/constants";
 import { aiCoachModel } from "@/features/ai-coach/lib/groq-provider";
+import { calculateMacros } from "@/features/ai-coach/lib/tools/calculate-macros";
 
 // Without this, Vercel applies its platform default execution limit, which
 // can be shorter than a long streamed answer takes to finish — cutting the
@@ -24,12 +25,23 @@ export async function POST(req: Request) {
     model: aiCoachModel,
     system: AI_COACH_SYSTEM_PROMPT,
     messages: await convertToModelMessages(messages),
-    // Qwen3 models emit their chain-of-thought as a literal <think> block in
-    // the text output unless told otherwise — "hidden" strips it so only the
-    // user-facing answer streams to the chat.
+    tools: { calculateMacros },
+    // Groq counts hidden reasoning tokens against the same budget as the
+    // visible answer, so without an explicit ceiling the default is small
+    // enough that long plans get cut off mid-sentence once it's reached.
+    maxOutputTokens: 4096,
     providerOptions: {
       groq: {
+        // Qwen3 models emit their chain-of-thought as a literal <think>
+        // block in the text output unless told otherwise — "hidden" strips
+        // it so only the user-facing answer streams to the chat.
         reasoningFormat: "hidden",
+        // Thinking mode is on by default ("default") and eats into the
+        // same token budget as the visible answer above. Groq only accepts
+        // "none" or "default" for this model — "low"/"medium"/"high" are
+        // valid for other Groq models but get rejected with a 400 here, so
+        // "none" is the only way to give the full budget to the answer.
+        reasoningEffort: "none",
       } satisfies GroqLanguageModelChatOptions,
     },
   });

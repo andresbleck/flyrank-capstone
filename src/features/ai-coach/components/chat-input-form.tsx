@@ -69,12 +69,13 @@ export const ChatInputForm = forwardRef<ChatInputFormHandle, ChatInputFormProps>
             aria-invalid={!!errors.content}
             aria-describedby={errors.content ? errorId : undefined}
             disabled={isStreaming}
-            className="bg-white/10 pr-20 text-white placeholder:text-gray-400"
+            className="bg-white/10 pr-20 text-white placeholder:text-gray-400 focus:border-orange-500!"
           />
           {isStreaming ? (
             <Button
               type="button"
               onClick={onStop}
+              variant="outline"
               className="absolute right-2 top-1/2 -translate-y-1/2"
             >
               Stop
@@ -91,6 +92,7 @@ export const ChatInputForm = forwardRef<ChatInputFormHandle, ChatInputFormProps>
           ) : (
             <Button
               type="submit"
+              variant="accent"
               className="absolute right-2 top-1/2 -translate-y-1/2"
             >
               Send

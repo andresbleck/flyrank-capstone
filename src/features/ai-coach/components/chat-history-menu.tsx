@@ -22,12 +22,13 @@ export function ChatHistoryMenu({ conversations, onSelect }: ChatHistoryMenuProp
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="bg-white/10 px-3 py-1.5 text-xs hover:bg-white/20"
+        variant="outline"
+        className="bg-orange-500! px-3 py-1.5 font-[family-name:var(--font-baloo-2)] text-xs font-semibold text-white! hover:bg-orange-600!"
       >
         History
       </Button>
       {isOpen && (
-        <ul className="absolute right-0 z-10 mt-2 max-h-64 w-56 overflow-y-auto rounded-md border border-white/10 bg-gray-900 py-1 shadow-lg">
+        <ul className="absolute right-0 z-10 mt-2 max-h-64 w-56 overflow-y-auto rounded-md border border-white/10 bg-neutral-900 py-1 shadow-lg">
           {conversations.map((conversation) => (
             <li key={conversation.id}>
               <button

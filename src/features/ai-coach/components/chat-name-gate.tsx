@@ -45,14 +45,20 @@ export function ChatNameGate({ onSubmitName }: ChatNameGateProps) {
         placeholder="Your name"
         aria-invalid={!!errors.name}
         aria-describedby={errors.name ? errorId : undefined}
-        className="bg-white/10 text-center text-white placeholder:text-gray-400"
+        className="bg-white/10 text-center text-white placeholder:text-gray-400 focus:border-orange-500!"
       />
       {errors.name && (
         <p id={errorId} role="alert" className="text-sm text-red-400">
           {errors.name.message}
         </p>
       )}
-      <Button type="submit">Start chatting</Button>
+      <Button
+        type="submit"
+        variant="accent"
+        className="font-[family-name:var(--font-baloo-2)] font-semibold"
+      >
+        Start chatting
+      </Button>
     </form>
   );
 }

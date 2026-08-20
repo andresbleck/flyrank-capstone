@@ -53,7 +53,7 @@ export const ChatMessageBubble = forwardRef<
           tabIndex={-1}
           className={`break-words rounded-lg px-3 py-2 text-sm ${
             isUser
-              ? "whitespace-pre-wrap bg-blue-600 text-white"
+              ? "whitespace-pre-wrap bg-orange-600 text-white"
               : "bg-white/10 text-white backdrop-blur-sm"
           }`}
         >
@@ -63,6 +63,14 @@ export const ChatMessageBubble = forwardRef<
             <Markdown components={markdownComponents}>{text}</Markdown>
           )}
         </div>
+        {/* TEMPORARY (Phase 2): remove in Phase 3 */}
+        {message.parts
+          .filter((part) => part.type.startsWith("tool-"))
+          .map((part, index) => (
+            <pre key={`${part.type}-${index}`}>
+              {JSON.stringify(part, null, 2)}
+            </pre>
+          ))}
       </div>
     </div>
   );
