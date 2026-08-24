@@ -18,6 +18,7 @@ import { ChatMessageList } from "@/features/ai-coach/components/chat-message-lis
 import { ChatNameGate } from "@/features/ai-coach/components/chat-name-gate";
 import {
   ArchivedConversation,
+  deleteArchivedConversation,
   persistMessages,
   persistName,
   readArchivedConversations,
@@ -96,6 +97,10 @@ export function AiCoachChat() {
     setArchivedConversations(readArchivedConversations());
   };
 
+  const handleDeleteConversation = (id: string) => {
+    setArchivedConversations(deleteArchivedConversation(id));
+  };
+
   // Runs client-only, after hydration, to avoid a server/client mismatch
   // (the server render never has access to localStorage). setMessages is
   // exempt from the lint rule below since it's not a useState setter, but
@@ -150,6 +155,7 @@ export function AiCoachChat() {
           <ChatHistoryMenu
             conversations={archivedConversations}
             onSelect={handleSelectConversation}
+            onDelete={handleDeleteConversation}
           />
           {name && (
             <Button

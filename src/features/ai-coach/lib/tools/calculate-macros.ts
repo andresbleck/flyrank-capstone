@@ -15,6 +15,16 @@ const GOAL_CALORIE_ADJUSTMENTS = {
   gain: 300,
 } as const;
 
+// Marks a message as safe to show the user as-is (it only describes bad
+// input, never internal state), so streamErrorHandler in route.ts can tell
+// it apart from provider/network errors, which must stay generic.
+export class CalculateMacrosValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CalculateMacrosValidationError";
+  }
+}
+
 // Type-level validation (e.g. rejecting a string) is handled by Zod at the schema
 // boundary. Physical bounds (e.g. age -5) still pass z.number() but are impossible,
 // so those are checked separately inside execute.
@@ -41,7 +51,7 @@ export const calculateMacros = tool({
   inputSchema: calculateMacrosInputSchema,
   execute: ({ age, weightKg, heightCm, sex, activityLevel, goal }) => {
     if (age < 14 || age > 100 || weightKg <= 0 || heightCm <= 0) {
-      throw new Error(
+      throw new CalculateMacrosValidationError(
         "Invalid data: age must be 14-100 and weight/height must be positive.",
       );
     }

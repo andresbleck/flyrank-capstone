@@ -6,6 +6,7 @@ import {
   AI_COACH_LOCAL_STORAGE_KEY,
 } from "@/features/ai-coach/constants";
 import {
+  deleteArchivedConversation,
   persistMessages,
   persistName,
   readArchivedConversations,
@@ -229,5 +230,47 @@ describe("switchToConversation", () => {
     expect(result).toBeNull();
     expect(readStoredName()).toBeNull();
     expect(readStoredMessages()).toEqual([]);
+  });
+});
+
+describe("deleteArchivedConversation", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("removes the matching conversation and leaves the rest intact", () => {
+    startNewConversation("Andres", [storedMessage]);
+    startNewConversation("Lucas", [otherMessage]);
+    const [andres, lucas] = readArchivedConversations();
+
+    const result = deleteArchivedConversation(andres.id);
+
+    expect(result).toEqual([lucas]);
+    expect(readArchivedConversations()).toEqual([lucas]);
+  });
+
+  it("does nothing when the id doesn't exist", () => {
+    startNewConversation("Andres", [storedMessage]);
+    const [andres] = readArchivedConversations();
+
+    const result = deleteArchivedConversation("missing-id");
+
+    expect(result).toEqual([andres]);
+    expect(readArchivedConversations()).toEqual([andres]);
+  });
+
+  it("does not throw when localStorage.setItem fails", () => {
+    startNewConversation("Andres", [storedMessage]);
+    const [andres] = readArchivedConversations();
+
+    const setItemSpy = vi
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new Error("QuotaExceededError");
+      });
+
+    expect(() => deleteArchivedConversation(andres.id)).not.toThrow();
+
+    setItemSpy.mockRestore();
   });
 });

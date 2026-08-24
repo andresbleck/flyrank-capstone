@@ -81,6 +81,21 @@ export function readArchivedConversations(): ArchivedConversation[] {
   }
 }
 
+// Used by the history menu's delete button: removes one archived
+// conversation permanently. Returns the updated list so callers can sync
+// their state without a second read.
+export function deleteArchivedConversation(id: string): ArchivedConversation[] {
+  try {
+    const list = readArchivedConversations().filter(
+      (conversation) => conversation.id !== id,
+    );
+    localStorage.setItem(AI_COACH_ARCHIVE_STORAGE_KEY, JSON.stringify(list));
+    return list;
+  } catch {
+    return readArchivedConversations();
+  }
+}
+
 function archive(conversation: Omit<ArchivedConversation, "id" | "endedAt">) {
   const list = readArchivedConversations();
   list.push({

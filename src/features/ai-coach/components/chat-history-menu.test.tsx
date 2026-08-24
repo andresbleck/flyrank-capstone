@@ -22,7 +22,7 @@ const lucas: ArchivedConversation = {
 describe("ChatHistoryMenu", () => {
   it("renders nothing when there are no archived conversations", () => {
     const { container } = render(
-      <ChatHistoryMenu conversations={[]} onSelect={vi.fn()} />,
+      <ChatHistoryMenu conversations={[]} onSelect={vi.fn()} onDelete={vi.fn()} />,
     );
 
     expect(container).toBeEmptyDOMElement();
@@ -32,7 +32,11 @@ describe("ChatHistoryMenu", () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     render(
-      <ChatHistoryMenu conversations={[andres, lucas]} onSelect={onSelect} />,
+      <ChatHistoryMenu
+        conversations={[andres, lucas]}
+        onSelect={onSelect}
+        onDelete={vi.fn()}
+      />,
     );
 
     expect(screen.queryByText("Andres")).not.toBeInTheDocument();
@@ -46,5 +50,52 @@ describe("ChatHistoryMenu", () => {
 
     expect(onSelect).toHaveBeenCalledExactlyOnceWith("2");
     expect(screen.queryByText("Andres")).not.toBeInTheDocument();
+  });
+
+  it("asks for confirmation and deletes the conversation when confirmed", async () => {
+    const user = userEvent.setup();
+    const onDelete = vi.fn();
+    const onSelect = vi.fn();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
+    render(
+      <ChatHistoryMenu
+        conversations={[andres, lucas]}
+        onSelect={onSelect}
+        onDelete={onDelete}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "History" }));
+    await user.click(
+      screen.getByRole("button", { name: "Borrar conversación de Andres" }),
+    );
+
+    expect(confirmSpy).toHaveBeenCalledOnce();
+    expect(onDelete).toHaveBeenCalledExactlyOnceWith("1");
+    expect(onSelect).not.toHaveBeenCalled();
+
+    confirmSpy.mockRestore();
+  });
+
+  it("does not delete the conversation when the confirmation is cancelled", async () => {
+    const user = userEvent.setup();
+    const onDelete = vi.fn();
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+    render(
+      <ChatHistoryMenu
+        conversations={[andres, lucas]}
+        onSelect={vi.fn()}
+        onDelete={onDelete}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "History" }));
+    await user.click(
+      screen.getByRole("button", { name: "Borrar conversación de Andres" }),
+    );
+
+    expect(onDelete).not.toHaveBeenCalled();
+
+    confirmSpy.mockRestore();
   });
 });

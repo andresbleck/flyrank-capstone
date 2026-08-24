@@ -9,7 +9,10 @@ import {
 
 import { AI_COACH_SYSTEM_PROMPT } from "@/features/ai-coach/constants";
 import { aiCoachModel } from "@/features/ai-coach/lib/groq-provider";
-import { calculateMacros } from "@/features/ai-coach/lib/tools/calculate-macros";
+import {
+  CalculateMacrosValidationError,
+  calculateMacros,
+} from "@/features/ai-coach/lib/tools/calculate-macros";
 
 // Without this, Vercel applies its platform default execution limit, which
 // can be shorter than a long streamed answer takes to finish — cutting the
@@ -17,6 +20,17 @@ import { calculateMacros } from "@/features/ai-coach/lib/tools/calculate-macros"
 // to whatever the project's plan allows, so it's safe to ask for more than
 // necessary.
 export const maxDuration = 60;
+
+// The AI SDK routes both tool errors (e.g. calculateMacros rejecting bad
+// input) and provider/stream errors (e.g. an invalid API key) through this
+// same callback. Only CalculateMacrosValidationError is known to be safe to
+// show verbatim — anything else falls back to a generic message so
+// provider/infra details never reach the user.
+function streamErrorHandler(error: unknown): string {
+  console.error("AI Coach stream error:", error);
+  if (error instanceof CalculateMacrosValidationError) return error.message;
+  return "The AI coach is unavailable right now.";
+}
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
@@ -49,10 +63,7 @@ export async function POST(req: Request) {
   return createUIMessageStreamResponse({
     stream: toUIMessageStream({
       stream: result.stream,
-      onError: (error) => {
-        console.error("AI Coach stream error:", error);
-        return "The AI coach is unavailable right now.";
-      },
+      onError: streamErrorHandler,
     }),
   });
 }

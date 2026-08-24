@@ -65,12 +65,25 @@ export const ChatInputForm = forwardRef<ChatInputFormHandle, ChatInputFormProps>
             {...register("content")}
             onKeyDown={handleKeyDown}
             rows={3}
-            placeholder="Ask your AI coach anything..."
+            placeholder={errors.content ? "" : "Ask your AI coach anything..."}
             aria-invalid={!!errors.content}
             aria-describedby={errors.content ? errorId : undefined}
             disabled={isStreaming}
-            className="bg-white/10 pr-20 text-white placeholder:text-gray-400 focus:border-orange-500!"
+            className={
+              errors.content
+                ? "bg-white/10 pr-20 text-white placeholder:text-gray-400 border-red-400!"
+                : "bg-white/10 pr-20 text-white placeholder:text-gray-400 focus:border-orange-500!"
+            }
           />
+          {errors.content && (
+            <p
+              id={errorId}
+              role="alert"
+              className="pointer-events-none absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-red-400"
+            >
+              {errors.content.message}
+            </p>
+          )}
           {isStreaming ? (
             <Button
               type="button"
@@ -99,11 +112,6 @@ export const ChatInputForm = forwardRef<ChatInputFormHandle, ChatInputFormProps>
             </Button>
           )}
         </div>
-        {errors.content && (
-          <p id={errorId} role="alert" className="text-sm text-red-400">
-            {errors.content.message}
-          </p>
-        )}
       </form>
     );
   },

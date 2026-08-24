@@ -48,6 +48,26 @@ describe("ChatInputForm", () => {
     expect(screen.getByRole("textbox")).toHaveAttribute("aria-invalid", "true");
   });
 
+  it("gives the textarea a red border, matching the error text color, when invalid", async () => {
+    const user = userEvent.setup();
+    render(
+      <ChatInputForm
+        onSubmit={vi.fn()}
+        onStop={vi.fn()}
+        onResume={vi.fn()}
+        isStreaming={false}
+        isPaused={false}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Send" }));
+
+    expect(screen.getByRole("textbox")).toHaveClass("border-red-400!");
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveClass("text-red-400");
+    expect(alert).toHaveClass("absolute", "inset-0", "flex", "items-center", "justify-center");
+  });
+
   it("shows a validation error and does not submit when the message is only whitespace", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();

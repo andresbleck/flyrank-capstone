@@ -3,6 +3,7 @@ import type { UIMessage } from "ai";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { POST } from "@/app/api/ai-coach/route";
+import { CalculateMacrosValidationError } from "@/features/ai-coach/lib/tools/calculate-macros";
 
 vi.mock("ai", async (importOriginal) => {
   const actual = await importOriginal<typeof import("ai")>();
@@ -73,6 +74,26 @@ describe("POST /api/ai-coach", () => {
 
     expect(body).toContain("The AI coach is unavailable right now.");
     expect(body).not.toContain("invalid api key");
+  });
+
+  it("surfaces calculateMacros's own validation message instead of the generic one", async () => {
+    vi.mocked(streamText).mockReturnValue({
+      stream: streamOf([
+        {
+          type: "error",
+          error: new CalculateMacrosValidationError(
+            "Invalid data: age must be 14-100 and weight/height must be positive.",
+          ),
+        },
+      ]),
+    } as unknown as ReturnType<typeof streamText>);
+
+    const response = await POST(requestWithBody({ messages: [userMessage] }));
+    const body = await response.text();
+
+    expect(body).toContain(
+      "Invalid data: age must be 14-100 and weight/height must be positive.",
+    );
   });
 
   it("rejects when the request body is not valid JSON", async () => {
