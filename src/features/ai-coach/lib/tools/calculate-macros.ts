@@ -50,9 +50,9 @@ export const calculateMacros = tool({
     "Estimate daily calorie and macronutrient needs using the Mifflin-St Jeor equation.",
   inputSchema: calculateMacrosInputSchema,
   execute: ({ age, weightKg, heightCm, sex, activityLevel, goal }) => {
-    if (age < 14 || age > 100 || weightKg <= 0 || heightCm <= 0) {
+    if (age < 14 || age > 100 || weightKg <= 0 || weightKg > 400 || heightCm <= 0 || heightCm > 250) {
       throw new CalculateMacrosValidationError(
-        "Invalid data: age must be 14-100 and weight/height must be positive.",
+        "Invalid data: age must be 14-100, weight must be 1-400 kg, and height must be 1-250 cm.",
       );
     }
 

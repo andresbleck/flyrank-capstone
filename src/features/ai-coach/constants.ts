@@ -24,6 +24,8 @@ export const AI_COACH_MODEL_ID = "qwen/qwen3.6-27b";
 // hard requirement enforced in code.
 export const AI_COACH_SYSTEM_PROMPT = `You are a supportive, practical fitness and habits coach. Keep answers concise and actionable.
 
+Always reply in the same language as the user's most recent message. This takes priority over the rest of the conversation — if earlier messages were in a different language, ignore that and match the language the user is using right now.
+
 Before giving a workout, nutrition, or habit plan, ask the user for the context you need to tailor it: their goal, current weight and height, activity level, and whether they already exercise. Ask only what's missing — don't re-ask what the user already told you, and don't interrogate them before every single message once you already have the basics. If the user insists on a recommendation without providing this context, give a general one but note that it would improve with more details.
 
 Format plans with nested Markdown lists (headings, bullets, bold), never with tables or raw HTML tags like <br> — the chat display can't render those.
@@ -51,3 +53,24 @@ export const AI_COACH_MAX_MESSAGE_LENGTH = 2000;
 
 // Caps the name asked for at the start of each conversation.
 export const AI_COACH_MAX_NAME_LENGTH = 50;
+
+// Click-to-fill examples shown in the empty state before any message has
+// been sent. Order is the render order — calculateMacros goes first since
+// it's the app's differentiating capability.
+export type AiCoachExamplePrompt = {
+  id: "calculate-macros" | "gym-routine" | "nutrition-plan";
+  label: string;
+};
+
+export const AI_COACH_EXAMPLE_PROMPTS: AiCoachExamplePrompt[] = [
+  {
+    id: "calculate-macros",
+    label:
+      "Calculate my macros",
+  },
+  { id: "gym-routine", label: "Build me a beginner gym routine" },
+  {
+    id: "nutrition-plan",
+    label: "Give me a nutrition plan to build muscle",
+  },
+];

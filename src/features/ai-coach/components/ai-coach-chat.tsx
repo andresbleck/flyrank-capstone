@@ -13,6 +13,7 @@ import {
   ChatInputForm,
   ChatInputFormHandle,
 } from "@/features/ai-coach/components/chat-input-form";
+import { ChatErrorBanner } from "@/features/ai-coach/components/chat-error-banner";
 import { ChatHistoryMenu } from "@/features/ai-coach/components/chat-history-menu";
 import { ChatMessageList } from "@/features/ai-coach/components/chat-message-list";
 import { ChatNameGate } from "@/features/ai-coach/components/chat-name-gate";
@@ -29,9 +30,10 @@ import {
 } from "@/features/ai-coach/hooks/use-chat-local-storage";
 
 export function AiCoachChat() {
-  const { messages, status, error, sendMessage, setMessages, stop } = useChat({
-    transport: new DefaultChatTransport({ api: AI_COACH_API_PATH }),
-  });
+  const { messages, status, error, sendMessage, setMessages, stop, regenerate } =
+    useChat({
+      transport: new DefaultChatTransport({ api: AI_COACH_API_PATH }),
+    });
 
   const isStreaming = status === "submitted" || status === "streaming";
   const isWaitingForReply = status === "submitted";
@@ -70,6 +72,15 @@ export function AiCoachChat() {
   const handleResume = () => {
     setIsPaused(false);
     sendMessage({ text: AI_COACH_RESUME_MESSAGE });
+  };
+
+  const handleRetry = () => {
+    if (isStreaming) return;
+    regenerate();
+  };
+
+  const handleSelectExample = (text: string) => {
+    chatInputRef.current?.fill(text);
   };
 
   const handleSubmitName = (submittedName: string) => {
@@ -177,11 +188,14 @@ export function AiCoachChat() {
             messages={messages}
             lastAssistantMessageRef={lastAssistantMessageRef}
             isWaitingForReply={isWaitingForReply}
+            onSelectExample={handleSelectExample}
           />
-          {error && (
-            <p role="alert" className="px-4 text-sm text-red-400">
-              {error.message}
-            </p>
+          {status === "error" && error && (
+            <ChatErrorBanner
+              message={error.message}
+              onRetry={handleRetry}
+              isRetrying={isStreaming}
+            />
           )}
           <div className="border-t border-white/10 bg-black/40 p-4 backdrop-blur-sm">
             <ChatInputForm

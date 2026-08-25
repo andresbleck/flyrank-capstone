@@ -1,8 +1,12 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { createRef } from "react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
-import { ChatInputForm } from "@/features/ai-coach/components/chat-input-form";
+import {
+  ChatInputForm,
+  ChatInputFormHandle,
+} from "@/features/ai-coach/components/chat-input-form";
 import { AI_COACH_MAX_MESSAGE_LENGTH } from "@/features/ai-coach/constants";
 
 describe("ChatInputForm", () => {
@@ -198,6 +202,30 @@ describe("ChatInputForm", () => {
     await user.click(resumeButton);
 
     expect(onResume).toHaveBeenCalledOnce();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("fills the textarea and focuses it via the imperative handle, without submitting", async () => {
+    const onSubmit = vi.fn();
+    const ref = createRef<ChatInputFormHandle>();
+    render(
+      <ChatInputForm
+        ref={ref}
+        onSubmit={onSubmit}
+        onStop={vi.fn()}
+        onResume={vi.fn()}
+        isStreaming={false}
+        isPaused={false}
+      />,
+    );
+
+    ref.current?.fill("Armá una rutina de gimnasio para principiantes");
+
+    const textbox = screen.getByRole("textbox");
+    expect(textbox).toHaveValue("Armá una rutina de gimnasio para principiantes");
+    // react-hook-form's setFocus applies asynchronously (confirmed even for
+    // the pre-existing plain .focus() method, not something fill() adds).
+    await waitFor(() => expect(textbox).toHaveFocus());
     expect(onSubmit).not.toHaveBeenCalled();
   });
 });

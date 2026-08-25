@@ -2,6 +2,7 @@ import { RefObject, useEffect, useRef } from "react";
 import { UIMessage } from "ai";
 
 import { Spinner } from "@/components/ui/spinner";
+import { ChatEmptyState } from "@/features/ai-coach/components/chat-empty-state";
 import { ChatMessageBubble } from "@/features/ai-coach/components/chat-message-bubble";
 
 // How close to the bottom (in pixels) still counts as "at the bottom" for
@@ -13,12 +14,14 @@ type ChatMessageListProps = {
   messages: UIMessage[];
   lastAssistantMessageRef: RefObject<HTMLDivElement | null>;
   isWaitingForReply: boolean;
+  onSelectExample: (text: string) => void;
 };
 
 export function ChatMessageList({
   messages,
   lastAssistantMessageRef,
   isWaitingForReply,
+  onSelectExample,
 }: ChatMessageListProps) {
   const lastAssistantMessageId = [...messages]
     .reverse()
@@ -55,10 +58,7 @@ export function ChatMessageList({
       className="flex flex-1 flex-col gap-2 overflow-y-auto p-4"
     >
       {messages.length === 0 && (
-        <p className="m-auto max-w-sm text-center text-sm text-gray-300">
-          Ask about your training, nutrition, or habits — I&apos;ll ask what I
-          need to know first.
-        </p>
+        <ChatEmptyState onSelectExample={onSelectExample} />
       )}
       {messages.map((message) => (
         <ChatMessageBubble

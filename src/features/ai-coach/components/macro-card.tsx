@@ -1,9 +1,9 @@
 import type { CalculateMacrosResult } from "@/features/ai-coach/lib/tools/calculate-macros";
 
 const GOAL_LABELS: Record<CalculateMacrosResult["goal"], string> = {
-  lose: "Bajar de peso",
-  maintain: "Mantener",
-  gain: "Ganar músculo",
+  lose: "Lose weight",
+  maintain: "Maintain",
+  gain: "Gain muscle",
 };
 
 export function MacroCard({
@@ -18,7 +18,7 @@ export function MacroCard({
   return (
     <div
       role="group"
-      aria-label={`Resultado del cálculo de macros — objetivo: ${GOAL_LABELS[goal]}`}
+      aria-label={`Macro calculation result — goal: ${GOAL_LABELS[goal]}`}
       className="w-full max-w-sm rounded-lg border border-white/15 bg-white/10 p-4 text-white backdrop-blur-sm"
     >
       <span className="inline-block w-fit rounded-full bg-orange-500 px-3 py-1 text-xs font-semibold text-white">
@@ -27,7 +27,7 @@ export function MacroCard({
 
       <div className="mt-3 text-center">
         <p className="text-xs tracking-wide text-gray-300 uppercase">
-          Calorías
+          Calories
         </p>
         <p className="text-4xl font-bold">
           {calories} <span className="text-base font-normal text-gray-300">kcal</span>
@@ -37,19 +37,19 @@ export function MacroCard({
       <dl className="mt-4 grid grid-cols-3 gap-2">
         <div className="rounded-md bg-white/5 py-2 text-center">
           <dt className="text-xs tracking-wide text-gray-400 uppercase">
-            Proteína
+            Protein
           </dt>
           <dd className="text-lg font-semibold">{protein} g</dd>
         </div>
         <div className="rounded-md bg-white/5 py-2 text-center">
           <dt className="text-xs tracking-wide text-gray-400 uppercase">
-            Carbos
+            Carbs
           </dt>
           <dd className="text-lg font-semibold">{carbs} g</dd>
         </div>
         <div className="rounded-md bg-white/5 py-2 text-center">
           <dt className="text-xs tracking-wide text-gray-400 uppercase">
-            Grasa
+            Fat
           </dt>
           <dd className="text-lg font-semibold">{fat} g</dd>
         </div>

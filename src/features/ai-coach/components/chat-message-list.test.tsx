@@ -1,9 +1,11 @@
 import { createRef } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { UIMessage } from "ai";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { ChatMessageList } from "@/features/ai-coach/components/chat-message-list";
+import { AI_COACH_EXAMPLE_PROMPTS } from "@/features/ai-coach/constants";
 
 // jsdom doesn't lay out content, so scrollHeight/clientHeight are always 0.
 // Override them per test to simulate a scrollable container.
@@ -41,6 +43,7 @@ describe("ChatMessageList auto-scroll", () => {
         messages={[userMessage]}
         lastAssistantMessageRef={ref}
         isWaitingForReply={false}
+        onSelectExample={vi.fn()}
       />,
     );
 
@@ -52,6 +55,7 @@ describe("ChatMessageList auto-scroll", () => {
         messages={[userMessage, assistantMessage]}
         lastAssistantMessageRef={ref}
         isWaitingForReply={false}
+        onSelectExample={vi.fn()}
       />,
     );
 
@@ -65,6 +69,7 @@ describe("ChatMessageList auto-scroll", () => {
         messages={[userMessage]}
         lastAssistantMessageRef={ref}
         isWaitingForReply={false}
+        onSelectExample={vi.fn()}
       />,
     );
 
@@ -81,6 +86,7 @@ describe("ChatMessageList auto-scroll", () => {
         messages={[userMessage, assistantMessage]}
         lastAssistantMessageRef={ref}
         isWaitingForReply={false}
+        onSelectExample={vi.fn()}
       />,
     );
 
@@ -94,6 +100,7 @@ describe("ChatMessageList auto-scroll", () => {
         messages={[userMessage]}
         lastAssistantMessageRef={ref}
         isWaitingForReply={false}
+        onSelectExample={vi.fn()}
       />,
     );
 
@@ -113,9 +120,47 @@ describe("ChatMessageList auto-scroll", () => {
         messages={[userMessage, assistantMessage]}
         lastAssistantMessageRef={ref}
         isWaitingForReply={false}
+        onSelectExample={vi.fn()}
       />,
     );
 
     expect(container.scrollTop).toBe(1200);
+  });
+});
+
+describe("ChatMessageList empty state", () => {
+  it("shows the clickable examples instead of message bubbles when there are no messages", () => {
+    render(
+      <ChatMessageList
+        messages={[]}
+        lastAssistantMessageRef={createRef()}
+        isWaitingForReply={false}
+        onSelectExample={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("Welcome to your AI Coach!")).toBeInTheDocument();
+    expect(screen.getAllByRole("button")).toHaveLength(3);
+  });
+
+  it("forwards the clicked example's text through onSelectExample", async () => {
+    const user = userEvent.setup();
+    const onSelectExample = vi.fn();
+    render(
+      <ChatMessageList
+        messages={[]}
+        lastAssistantMessageRef={createRef()}
+        isWaitingForReply={false}
+        onSelectExample={onSelectExample}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: AI_COACH_EXAMPLE_PROMPTS[0].label }),
+    );
+
+    expect(onSelectExample).toHaveBeenCalledExactlyOnceWith(
+      AI_COACH_EXAMPLE_PROMPTS[0].label,
+    );
   });
 });

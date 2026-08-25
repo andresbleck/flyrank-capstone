@@ -22,6 +22,7 @@ type ChatInputFormProps = {
 
 export type ChatInputFormHandle = {
   focus: () => void;
+  fill: (text: string) => void;
 };
 
 export const ChatInputForm = forwardRef<ChatInputFormHandle, ChatInputFormProps>(
@@ -34,6 +35,7 @@ export const ChatInputForm = forwardRef<ChatInputFormHandle, ChatInputFormProps>
       handleSubmit,
       reset,
       setFocus,
+      setValue,
       formState: { errors },
     } = useForm<ChatMessageInput>({
       resolver: zodResolver(chatMessageSchema),
@@ -42,6 +44,10 @@ export const ChatInputForm = forwardRef<ChatInputFormHandle, ChatInputFormProps>
 
     useImperativeHandle(ref, () => ({
       focus: () => setFocus("content"),
+      fill: (text: string) => {
+        setValue("content", text);
+        setFocus("content");
+      },
     }));
 
     const submit = handleSubmit(({ content }) => {

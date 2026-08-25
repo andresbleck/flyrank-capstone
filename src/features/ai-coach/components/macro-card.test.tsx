@@ -18,7 +18,7 @@ describe("MacroCard", () => {
     render(<MacroCard {...result} />);
 
     expect(
-      screen.getByRole("group", { name: /Mantener/ }),
+      screen.getByRole("group", { name: /Maintain/ }),
     ).toBeInTheDocument();
     expect(screen.getByText("2200")).toBeInTheDocument();
     expect(screen.getByText("150 g")).toBeInTheDocument();
@@ -27,8 +27,8 @@ describe("MacroCard", () => {
   });
 
   it.each([
-    ["lose", "Bajar de peso"],
-    ["gain", "Ganar músculo"],
+    ["lose", "Lose weight"],
+    ["gain", "Gain muscle"],
   ] as const)("labels the '%s' goal as '%s'", (goal, label) => {
     render(<MacroCard {...result} goal={goal} />);
 

@@ -34,6 +34,7 @@ vi.mock("@/features/ai-coach/hooks/use-chat-local-storage", () => ({
 const sendMessage = vi.fn();
 const setMessages = vi.fn();
 const stop = vi.fn();
+const regenerate = vi.fn();
 
 const userMessage: UIMessage = {
   id: "u1",
@@ -59,6 +60,7 @@ function mockUseChat(overrides: {
     sendMessage,
     setMessages,
     stop,
+    regenerate,
     // Fields required by the real hook's type but unused by AiCoachChat.
   } as unknown as ReturnType<typeof useChat>);
 }
@@ -183,6 +185,24 @@ describe("AiCoachChat", () => {
     expect(screen.getByRole("button", { name: "Send" })).not.toBeDisabled();
   });
 
+  it("retries via regenerate when Retry is clicked after a failed request", async () => {
+    const user = userEvent.setup();
+    mockUseChat({ status: "error", error: new Error("Request failed") });
+
+    render(<AiCoachChat />);
+    await user.click(screen.getByRole("button", { name: "Retry" }));
+
+    expect(regenerate).toHaveBeenCalledOnce();
+  });
+
+  it("does not show the error banner while a retried response is streaming in, even with a stale error", () => {
+    mockUseChat({ status: "streaming", error: new Error("Request failed") });
+
+    render(<AiCoachChat />);
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("shows an enabled Stop button while a response is streaming in", async () => {
     const user = userEvent.setup();
     mockUseChat({ messages: [userMessage], status: "streaming" });
@@ -267,8 +287,25 @@ describe("AiCoachChat", () => {
     render(<AiCoachChat />);
 
     expect(
-      screen.getByText(/ask about your training, nutrition, or habits/i),
+      screen.getByText("Welcome to your AI Coach!"),
     ).toBeInTheDocument();
+  });
+
+  it("fills the chat input with the clicked example instead of sending it", async () => {
+    const user = userEvent.setup();
+    mockUseChat({ messages: [], status: "ready" });
+
+    render(<AiCoachChat />);
+    await user.click(
+      screen.getByRole("button", {
+        name: "Build me a beginner gym routine",
+      }),
+    );
+
+    expect(
+      screen.getByPlaceholderText("Ask your AI coach anything..."),
+    ).toHaveValue("Build me a beginner gym routine");
+    expect(sendMessage).not.toHaveBeenCalled();
   });
 
   it("shows a typing indicator once the message is submitted, before the first token arrives", () => {
