@@ -109,6 +109,24 @@ All four blocker-level accessibility issues (accessible name on the chat input,
 reachable chat log, screen-reader announcement of AI responses, and pausable
 testimonials) have been fixed.
 
+## Performance notes
+
+Lighthouse performance scores (mobile, production):
+- `/contact` — 85
+- `/` — 81
+- `/ai-coach` — 58
+
+Accessibility scores 96 across all routes.
+
+The `/ai-coach` route scores lowest on performance (58). Analysis of the
+Lighthouse trace shows this is not a network problem — the critical path
+resolves in ~570ms — but a client-side JavaScript cost: Total Blocking Time is
+~1s and LCP (5.1s) waits on hydration of the AI chat (Vercel AI SDK, streaming
+logic, chat state). This is an inherent trade-off of running a conversational
+LLM feature client-side. Reducing it further would require code-splitting and
+deferring the AI SDK, deprioritized for this scope in favor of accessibility
+(96) and test coverage (~95%).
+
 ## License
 
 Released under the [MIT License](LICENSE).

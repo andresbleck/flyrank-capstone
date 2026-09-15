@@ -8,6 +8,7 @@ import {
 } from "ai";
 
 import { AI_COACH_SYSTEM_PROMPT } from "@/features/ai-coach/constants";
+import { chatRequestSchema } from "@/features/ai-coach/lib/chat-request-schema";
 import { aiCoachModel } from "@/features/ai-coach/lib/groq-provider";
 import {
   CalculateMacrosValidationError,
@@ -32,8 +33,31 @@ function streamErrorHandler(error: unknown): string {
   return "The AI coach is unavailable right now.";
 }
 
+// One generic message for every rejection. A more specific error would be
+// friendlier to debug, but the client never displays it (useChat surfaces its
+// own generic failure), so the only reader is whoever is probing the route —
+// and they don't need a map of what the schema accepts.
+function invalidRequestResponse(): Response {
+  return Response.json({ error: "Invalid request." }, { status: 400 });
+}
+
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return invalidRequestResponse();
+  }
+
+  if (!chatRequestSchema.safeParse(body).success) {
+    return invalidRequestResponse();
+  }
+
+  // Safe after the check above, which guarantees `messages` is a non-empty
+  // array of well-formed messages. The cast only restores the AI SDK's richer
+  // `UIMessage` type: the gate schema deliberately doesn't model tool parts,
+  // so the original body — not the schema's output — is what reaches the model.
+  const { messages } = body as { messages: UIMessage[] };
 
   const result = streamText({
     model: aiCoachModel,

@@ -51,6 +51,13 @@ export const AI_COACH_RESUME_MESSAGE =
 // Caps how much a single message can cost to generate a response for.
 export const AI_COACH_MAX_MESSAGE_LENGTH = 2000;
 
+// Caps how much history one request can carry. The client resends the whole
+// conversation on every turn, so this bounds what a direct POST to the API
+// can ask the model to read. 50 is ~25 back-and-forth turns — far past any
+// real conversation, since Groq's tokens-per-minute limit bites well before
+// that.
+export const AI_COACH_MAX_MESSAGES_PER_REQUEST = 50;
+
 // Caps the name asked for at the start of each conversation.
 export const AI_COACH_MAX_NAME_LENGTH = 50;
 
