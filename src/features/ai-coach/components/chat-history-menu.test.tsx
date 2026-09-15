@@ -67,7 +67,7 @@ describe("ChatHistoryMenu", () => {
 
     await user.click(screen.getByRole("button", { name: "History" }));
     await user.click(
-      screen.getByRole("button", { name: "Borrar conversación de Andres" }),
+      screen.getByRole("button", { name: "Delete conversation with Andres" }),
     );
 
     expect(confirmSpy).toHaveBeenCalledOnce();
@@ -91,7 +91,7 @@ describe("ChatHistoryMenu", () => {
 
     await user.click(screen.getByRole("button", { name: "History" }));
     await user.click(
-      screen.getByRole("button", { name: "Borrar conversación de Andres" }),
+      screen.getByRole("button", { name: "Delete conversation with Andres" }),
     );
 
     expect(onDelete).not.toHaveBeenCalled();

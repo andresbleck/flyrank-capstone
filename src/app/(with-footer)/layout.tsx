@@ -7,7 +7,9 @@ export default function WithFooterLayout({
 }) {
   return (
     <>
-      {children}
+      <main id="main-content" className="flex flex-1 flex-col">
+        {children}
+      </main>
       <Footer />
     </>
   );

@@ -54,7 +54,13 @@ export function ChatMessageList({
       ref={scrollContainerRef}
       onScroll={handleScroll}
       role="log"
-      aria-live="polite"
+      // Silenced on purpose: streaming the reply token by token through a live
+      // region reads it out word by word. The finished reply is announced once
+      // from the role="status" region in AiCoachChat instead. role="log"
+      // defaults to aria-live="polite", so this has to be explicit.
+      aria-live="off"
+      aria-label="Conversation with the AI coach"
+      tabIndex={0}
       className="flex flex-1 flex-col gap-2 overflow-y-auto p-4"
     >
       {messages.length === 0 && (

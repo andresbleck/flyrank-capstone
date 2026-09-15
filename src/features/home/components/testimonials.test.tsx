@@ -136,18 +136,40 @@ describe("Testimonials", () => {
     expect(getTranslateXPercent(track)).toBeCloseTo(-100 / TRACK_LENGTH, 3);
   });
 
-  it("pauses sliding on keyboard focus and resumes on blur", async () => {
+  it("pauses and resumes sliding from the pause button", async () => {
     const { container } = render(<Testimonials />);
-    const quote = screen.getAllByText(/I walked in barely knowing/)[0];
     const track = getTrack(container);
 
-    fireEvent.focusIn(quote);
+    const pauseButton = screen.getByRole("button", { name: "Pause reviews" });
+    expect(pauseButton).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(pauseButton);
     await advanceOneStep();
     expect(getTranslateXPercent(track)).toBeCloseTo(0, 5);
 
-    fireEvent.focusOut(quote, { relatedTarget: document.body });
+    const resumeButton = screen.getByRole("button", { name: "Resume reviews" });
+    expect(resumeButton).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.click(resumeButton);
     await advanceOneStep();
     expect(getTranslateXPercent(track)).toBeCloseTo(-100 / TRACK_LENGTH, 3);
+  });
+
+  it("stays paused when the mouse leaves after the button paused it", async () => {
+    const { container } = render(<Testimonials />);
+    const track = getTrack(container);
+    const carousel = getCarousel(container);
+
+    fireEvent.click(screen.getByRole("button", { name: "Pause reviews" }));
+    fireEvent.mouseEnter(carousel);
+    fireEvent.mouseLeave(carousel);
+    await advanceOneStep();
+
+    // El hover no puede despausar lo que el usuario pausó a propósito.
+    expect(getTranslateXPercent(track)).toBeCloseTo(0, 5);
+    expect(
+      screen.getByRole("button", { name: "Resume reviews" }),
+    ).toHaveAttribute("aria-pressed", "true");
   });
 
   it("does not auto-slide when prefers-reduced-motion is enabled", async () => {

@@ -59,6 +59,16 @@ export function AiCoachChat() {
     ArchivedConversation[]
   >([]);
 
+  // Text handed to the sr-only role="status" region once a reply has fully
+  // streamed in, so screen readers hear the finished answer instead of every
+  // token as it arrives.
+  const [assistantAnnouncement, setAssistantAnnouncement] = useState("");
+  // Guards the announcement against firing for messages that were never
+  // streamed in this session: the hydration effect below loads stored
+  // messages while status is already "ready", and so does switching
+  // conversations from the history menu.
+  const wasStreamingRef = useRef(false);
+
   const handleSubmit = (content: string) => {
     setIsPaused(false);
     sendMessage({ text: content });
@@ -133,9 +143,33 @@ export function AiCoachChat() {
   }, [status, messages]);
 
   useEffect(() => {
-    if (status === "ready") {
-      lastAssistantMessageRef.current?.focus();
+    if (isStreaming) {
+      wasStreamingRef.current = true;
+      return;
     }
+    if (status !== "ready" || !wasStreamingRef.current) return;
+    wasStreamingRef.current = false;
+
+    const lastAssistantMessage = [...messages]
+      .reverse()
+      .find((message) => message.role === "assistant");
+
+    setAssistantAnnouncement(
+      lastAssistantMessage?.parts
+        .filter((part) => part.type === "text")
+        .map((part) => part.text)
+        .join("") ?? "",
+    );
+  }, [status, isStreaming, messages]);
+
+  // The input is disabled while streaming, and disabling the focused element
+  // drops focus to <body> — so focus has to be handed back once the reply is
+  // done. Only when it actually landed on <body>: if the user tabbed away to
+  // re-read the log, leave them there.
+  useEffect(() => {
+    if (status !== "ready") return;
+    if (document.activeElement !== document.body) return;
+    chatInputRef.current?.focus();
   }, [status]);
 
   useEffect(() => {
@@ -190,6 +224,12 @@ export function AiCoachChat() {
             isWaitingForReply={isWaitingForReply}
             onSelectExample={handleSelectExample}
           />
+          {/* Always mounted, filled only once the reply is complete — a live
+              region that appears at the same time as its content is often
+              missed by screen readers. */}
+          <div role="status" className="sr-only">
+            {assistantAnnouncement}
+          </div>
           {status === "error" && error && (
             <ChatErrorBanner
               message={error.message}

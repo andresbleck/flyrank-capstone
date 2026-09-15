@@ -68,13 +68,13 @@ export function ChatHistoryMenu({
                 onClick={() => {
                   if (
                     window.confirm(
-                      `¿Borrar la conversación de ${conversation.name}? Esta acción no se puede deshacer.`,
+                      `Delete the conversation with ${conversation.name}? This can't be undone.`,
                     )
                   ) {
                     onDelete(conversation.id);
                   }
                 }}
-                aria-label={`Borrar conversación de ${conversation.name}`}
+                aria-label={`Delete conversation with ${conversation.name}`}
                 className="mr-1 shrink-0 cursor-pointer rounded p-2 text-gray-400 hover:bg-red-500/10 hover:text-red-400"
               >
                 <TrashIcon className="h-4 w-4" />

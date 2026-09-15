@@ -22,9 +22,9 @@ type CalculateMacrosUITool = InferUITool<typeof calculateMacros>;
 type CalculateMacrosPart = ToolUIPart<{ calculateMacros: CalculateMacrosUITool }>;
 
 const GOAL_LABELS: Record<CalculateMacrosUITool["output"]["goal"], string> = {
-  lose: "bajar de peso",
-  maintain: "mantener",
-  gain: "ganar músculo",
+  lose: "lose weight",
+  maintain: "maintain",
+  gain: "gain muscle",
 };
 
 const markdownComponents: Components = {
@@ -97,7 +97,7 @@ export const ChatMessageBubble = forwardRef<
                     className="flex w-full max-w-sm items-center gap-2 text-sm text-gray-300 animate-[tool-state-fade-in_200ms_ease-out]"
                   >
                     <Spinner />
-                    El coach está armando tu consulta…
+                    Your coach is preparing your request…
                   </div>
                 );
               case "input-available": {
@@ -107,8 +107,8 @@ export const ChatMessageBubble = forwardRef<
                     key={`${callId}-${part.state}`}
                     className="w-full max-w-sm rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-gray-200 animate-[tool-state-fade-in_200ms_ease-out]"
                   >
-                    Voy a calcular para: {age} años · {weightKg} kg ·{" "}
-                    {heightCm} cm · objetivo: {GOAL_LABELS[goal]}
+                    Calculating for: {age} yrs · {weightKg} kg · {heightCm} cm ·
+                    goal: {GOAL_LABELS[goal]}
                   </div>
                 );
               }
@@ -129,8 +129,7 @@ export const ChatMessageBubble = forwardRef<
                     className="w-full max-w-sm rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-200 animate-[tool-state-fade-in_200ms_ease-out]"
                   >
                     <p className="font-semibold text-red-300">
-                      No se pudo realizar el cálculo. Revisá tus datos e
-                      intentá de nuevo.
+                      The calculation failed. Check your details and try again.
                     </p>
                     {part.errorText && (
                       <p className="mt-1 font-mono text-xs text-red-400/80">

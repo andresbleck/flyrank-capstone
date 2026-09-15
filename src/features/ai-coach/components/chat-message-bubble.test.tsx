@@ -47,7 +47,7 @@ describe("ChatMessageBubble tool part rendering", () => {
     );
 
     expect(
-      screen.getByText("El coach está armando tu consulta…"),
+      screen.getByText("Your coach is preparing your request…"),
     ).toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(screen.queryByRole("group")).not.toBeInTheDocument();
@@ -64,7 +64,7 @@ describe("ChatMessageBubble tool part rendering", () => {
     );
 
     expect(
-      screen.getByText(/Voy a calcular para: 30 años/),
+      screen.getByText(/Calculating for: 30 yrs/),
     ).toBeInTheDocument();
     expect(screen.queryByRole("group")).not.toBeInTheDocument();
   });
@@ -99,7 +99,7 @@ describe("ChatMessageBubble tool part rendering", () => {
 
     const alert = screen.getByRole("alert");
     expect(alert).toHaveTextContent(
-      "No se pudo realizar el cálculo. Revisá tus datos e intentá de nuevo.",
+      "The calculation failed. Check your details and try again.",
     );
     expect(alert).toHaveTextContent(
       "Invalid data: age must be 14-100 and weight/height must be positive.",
@@ -117,7 +117,7 @@ describe("ChatMessageBubble tool part rendering", () => {
     );
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "No se pudo realizar el cálculo. Revisá tus datos e intentá de nuevo.",
+      "The calculation failed. Check your details and try again.",
     );
   });
 });

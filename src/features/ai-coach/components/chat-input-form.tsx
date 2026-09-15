@@ -63,11 +63,16 @@ export const ChatInputForm = forwardRef<ChatInputFormHandle, ChatInputFormProps>
     };
 
     const errorId = "chat-input-error";
+    const textareaId = "chat-message-input";
 
     return (
       <form onSubmit={submit} className="flex flex-col gap-2">
+        <label htmlFor={textareaId} className="sr-only">
+          Message for the AI coach
+        </label>
         <div className="relative">
           <Textarea
+            id={textareaId}
             {...register("content")}
             onKeyDown={handleKeyDown}
             rows={3}

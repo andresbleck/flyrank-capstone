@@ -154,7 +154,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-gray-500">
+        <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-gray-400">
           © {new Date().getFullYear()} FORGE. All rights reserved.
         </div>
       </div>

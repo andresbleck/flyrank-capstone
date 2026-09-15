@@ -114,7 +114,7 @@ export function PricingPlans() {
               </span>
               <span className="text-sm text-gray-400">/mo</span>
             </div>
-            <p className="text-xs text-gray-500">{plan.billingNote}</p>
+            <p className="text-xs text-gray-400">{plan.billingNote}</p>
 
             <ul className="mt-6 flex flex-1 flex-col gap-3 text-sm text-gray-200">
               {plan.features.map((feature) => (

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  type FocusEvent,
-  type SVGProps,
-} from "react";
+import { useEffect, useState, type SVGProps } from "react";
 
 const STEP_INTERVAL_MS = 2500;
 const SLIDE_TRANSITION_MS = 600;
@@ -157,7 +152,12 @@ function ReviewCard({ review }: { review: Review }) {
 export function Testimonials() {
   const [index, setIndex] = useState(0);
   const [transitionEnabled, setTransitionEnabled] = useState(true);
-  const [isPaused, setIsPaused] = useState(false);
+  // Two separate sources of pausing: hover is transient, the button is a
+  // deliberate choice. Kept apart so moving the mouse away can't resume a
+  // carousel the user paused on purpose (which would also make aria-pressed lie).
+  const [isPausedByUser, setIsPausedByUser] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const isPaused = isPausedByUser || isHovered;
 
   // Avanza la ventana de a un paso mientras no esté pausada ni en el tramo
   // final del loop (ver el efecto de reset más abajo).
@@ -207,12 +207,6 @@ export function Testimonials() {
     return () => clearTimeout(timeoutId);
   }, [transitionEnabled]);
 
-  function handleFocusLeave(event: FocusEvent<HTMLElement>) {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-      setIsPaused(false);
-    }
-  }
-
   return (
     <section
       id="reviews"
@@ -228,10 +222,8 @@ export function Testimonials() {
       </div>
 
       <div
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        onFocus={() => setIsPaused(true)}
-        onBlur={handleFocusLeave}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         className="mx-auto mt-16 max-w-6xl"
       >
         <div className="-mx-4 overflow-hidden [--visible:1] sm:[--visible:2] lg:[--visible:4]">
@@ -256,6 +248,17 @@ export function Testimonials() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="mt-8 flex justify-center">
+        <button
+          type="button"
+          onClick={() => setIsPausedByUser((paused) => !paused)}
+          aria-pressed={isPausedByUser}
+          className="cursor-pointer rounded-md border border-white/20 px-4 py-2 font-[family-name:var(--font-baloo-2)] text-sm font-semibold text-gray-200 transition-colors duration-300 ease-out hover:border-orange-500/60 hover:text-orange-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+        >
+          {isPausedByUser ? "Resume reviews" : "Pause reviews"}
+        </button>
       </div>
     </section>
   );

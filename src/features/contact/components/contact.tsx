@@ -211,7 +211,7 @@ function ContactChannelRow({ channel }: { channel: ContactChannel }) {
         <p className="font-[family-name:var(--font-baloo-2)] text-lg font-bold text-white">
           {channel.value}
         </p>
-        <p className="text-xs text-gray-500">{channel.helperText}</p>
+        <p className="text-xs text-gray-400">{channel.helperText}</p>
       </div>
       {channel.href && (
         <ArrowIcon className="h-4 w-4 shrink-0 text-gray-500 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:text-orange-500" />
