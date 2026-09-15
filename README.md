@@ -94,38 +94,46 @@ a negative weight is still a valid number. So `execute` also checks that age is
 between 14 and 100 and that weight/height are positive, and throws a clear error
 if not.
 
-## Known accessibility limitations
+## Known limitations & future improvements
 
-Two WCAG 2.1 AA contrast issues are known and not yet resolved:
-
-- Orange accent buttons (orange-500 with white text) fall slightly below the
-  4.5:1 contrast ratio. Fixing this means shifting button backgrounds to a darker
-  orange (orange-700), which affects the brand color across ~7 components.
-  Deferred to keep the current visual identity; planned as a follow-up.
-- Some 12px muted text (gray-500 on dark backgrounds) is below 4.5:1. Low
-  priority, as it's used for secondary metadata only.
-
+### Accessibility
 All four blocker-level accessibility issues (accessible name on the chat input,
 reachable chat log, screen-reader announcement of AI responses, and pausable
-testimonials) have been fixed.
+testimonials) have been fixed. Two lower-severity WCAG 2.1 AA contrast issues
+remain:
+- Orange accent buttons (orange-500 with white text) fall slightly below the
+  4.5:1 contrast ratio. Fixing this means a darker orange (orange-700) across
+  ~7 components; deferred to keep the current brand identity.
+- Some 12px muted text (gray-500 on dark) is below 4.5:1. Low priority —
+  secondary metadata only.
 
-## Performance notes
+### AI route
+- No request-rate limiting. Input is validated and capped server-side (message
+  length, message count, allowed roles), which prevents oversized or malformed
+  abuse — but a client could still send many valid requests in a loop. Per-user
+  rate limiting is the intended next step.
+- The full conversation history is re-sent on every turn, so long conversations
+  eventually hit Groq's tokens-per-minute limit. A context window (trimming old
+  messages) would fix this.
+- Plain-text prompt injection ("ignore your instructions" inside a normal user
+  message) is not fully mitigated. This is an open problem across the industry,
+  not specific to this app; the system prompt is injected server-side and cannot
+  be overridden via the request body.
 
-Lighthouse performance scores (mobile, production):
-- `/contact` — 85
-- `/` — 81
-- `/ai-coach` — 58
+### Performance
+- The `/ai-coach` route scores ~58 on Lighthouse mobile performance. The trace
+  shows this is not a network issue (critical path ~570ms) but the cost of
+  hydrating the AI chat client-side (Total Blocking Time ~1s, LCP 5.1s). This is
+  an inherent trade-off of a client-side conversational LLM. Code-splitting and
+  deferring the AI SDK would improve it; deprioritized in favor of accessibility
+  (96) and test coverage (~95%).
 
-Accessibility scores 96 across all routes.
+### Future improvements
+- User authentication, so only signed-in members can use the chat (also enables
+  per-user rate limiting).
+- Context-window management to stay within token limits on long conversations.
+- Darker orange token to close the remaining contrast gaps.
 
-The `/ai-coach` route scores lowest on performance (58). Analysis of the
-Lighthouse trace shows this is not a network problem — the critical path
-resolves in ~570ms — but a client-side JavaScript cost: Total Blocking Time is
-~1s and LCP (5.1s) waits on hydration of the AI chat (Vercel AI SDK, streaming
-logic, chat state). This is an inherent trade-off of running a conversational
-LLM feature client-side. Reducing it further would require code-splitting and
-deferring the AI SDK, deprioritized for this scope in favor of accessibility
-(96) and test coverage (~95%).
 
 ## License
 
