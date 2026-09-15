@@ -1,11 +1,11 @@
-# Deployment Checklist — Cúspide Gym
+# Deployment Checklist — FORGE
 
 **Platform:** Vercel (auto-deploy from `main`)
 **Production URL:** https://flyrank-capstone-two.vercel.app/
 
 ## Pre-deploy
 - [x] `npm run build` passes with no errors
-- [x] All tests green (169 passing, ~95% coverage)
+- [x] All tests green (175 unit/component tests + Playwright e2e)
 - [x] `tsc` and `eslint` clean
 - [x] Environment variables set in Vercel (`GROQ_API_KEY`)
 - [x] `.env.local` is gitignored — no secrets committed to the repo
@@ -15,6 +15,7 @@
 - [x] Production URL loads
 - [x] AI Coach responds in production
 - [x] Contact page renders and info is correct
+- [x] `/health` renders the live fetch result
 - [x] Tested on mobile
 - [x] Keyboard navigation works (skip link, focus ring, chat focus retained)
 
@@ -31,6 +32,7 @@
 ## Known limitations (see README)
 - No request-rate limiting (input caps only) — documented as future work
 - `/ai-coach` Lighthouse performance ~58 (AI SDK hydration cost) — documented trade-off
+- SVG icons defined inline per component, one duplicated — documented as future work
 
 ---
 Signed off: Andres — 15/09/2026

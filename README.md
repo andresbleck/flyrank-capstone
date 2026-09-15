@@ -1,23 +1,25 @@
-# FlyRank Capstone — Cúspide Gym
+# FlyRank Capstone — FORGE
 
 Capstone project for the FlyRank Frontend AI Engineering Internship — a portfolio
 demonstrating the ability to turn client ideas into simple, functional, and intuitive
 web applications.
 
-Cúspide Gym is a web app for a gym with a built-in AI coach. Instead of a form that
+FORGE is a web app for a gym with a built-in AI coach. Instead of a form that
 always asks the same questions, the coach has a conversation: it asks only for the
 details it's missing, remembers what you already told it, and adapts the plan to your
 goal — training, nutrition, or habits.
 
+**Live:** https://flyrank-capstone-two.vercel.app/
+
 ## Tech Stack
 
-- Next.js (App Router)
-- React
+- Next.js 16 (App Router) + React 19
 - TypeScript
-
-- Tailwind CSS
-- Vercel AI SDK
-- Groq (Llama 3.3 70B)
+- Tailwind CSS v4
+- React Hook Form + Zod (forms and server-side request validation)
+- Vercel AI SDK + Groq (streaming chat and tool calling)
+- Vitest + Testing Library (unit and component tests)
+- Playwright (end-to-end)
 
 ## Getting Started
 
@@ -53,13 +55,34 @@ npm run dev
 
 The app runs at `http://localhost:3000` by default.
 
+### Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | ESLint |
+| `npm test` | Unit and component tests (Vitest) |
+| `npm run test:e2e` | End-to-end tests (Playwright) |
+| `npm run test:e2e:ui` | Playwright in UI mode |
+
+Coverage is available through Vitest directly: `npx vitest run --coverage`.
+
 ## Architecture
 
-Three routes:
+Four routes:
 
-- `/` — landing page for the gym (hero, pricing, testimonials).
-- `/contact` — contact info and a message form.
+- `/` — landing page for the gym (hero, pricing, metrics, testimonials).
+- `/contact` — contact info, locations, FAQ, and a message form.
 - `/ai-coach` — the main feature: a conversational AI fitness coach.
+- `/health` — a server-side data fetching check. It renders a live third-party
+  response, or a failure message when the request fails. Not linked from the
+  navigation; it exists to demonstrate server-component fetching and error handling.
+
+Code is organized by feature: `src/features/<feature>/{components,hooks,lib}`, with
+cross-feature primitives in `src/components/ui`. Tests live next to the file they
+cover.
 
 The AI Coach is built with the Vercel AI SDK. The chat UI streams the model's
 response token by token and handles four states: streaming, ready, awaiting
@@ -68,8 +91,11 @@ it has enough data to compute exact numbers.
 
 ## AI Integration
 
-The AI Coach uses Groq (Llama 3.3 70B, with Llama 3.1 8B Instant as fallback)
-through the Vercel AI SDK.
+The AI Coach runs on Groq through the Vercel AI SDK. The current model is
+`qwen/qwen3.6-27b`, chosen for its streaming speed. It's a Groq *preview* model, so
+the fallback — `openai/gpt-oss-20b` — is documented in
+`src/features/ai-coach/constants.ts` along with the provider options each one needs.
+Model and prompt configuration live in that single file.
 
 The system prompt makes the model behave like a practical fitness and habits
 coach: it asks only for the context it's missing, remembers what the user already
@@ -93,6 +119,21 @@ Zod checks that the inputs are the right type, but that's not enough on its own 
 a negative weight is still a valid number. So `execute` also checks that age is
 between 14 and 100 and that weight/height are positive, and throws a clear error
 if not.
+
+## Testing
+
+175 tests across 26 files (Vitest + Testing Library), plus one Playwright
+end-to-end run covering the primary chat flow. Tests cover happy paths, validation
+rules, failure states, and edge cases — including schema boundaries, localStorage
+persistence, error banners, and accessibility behaviour like focus movement after
+submit.
+
+## Further reading
+
+- [WORKFLOW.md](WORKFLOW.md) — vague prompt vs. detailed prompt: the same contact
+  form built twice, and what changed underneath.
+- [DEPLOYMENT.md](DEPLOYMENT.md) — deployment checklist, failure handling, and
+  rollback plan.
 
 ## Known limitations & future improvements
 
@@ -126,14 +167,15 @@ remain:
   hydrating the AI chat client-side (Total Blocking Time ~1s, LCP 5.1s). This is
   an inherent trade-off of a client-side conversational LLM. Code-splitting and
   deferring the AI SDK would improve it; deprioritized in favor of accessibility
-  (96) and test coverage (~95%).
+  (96) and test coverage.
 
 ### Future improvements
 - User authentication, so only signed-in members can use the chat (also enables
   per-user rate limiting).
 - Context-window management to stay within token limits on long conversations.
 - Darker orange token to close the remaining contrast gaps.
-
+- A shared icon module — SVG icons are currently defined inline in the components
+  that use them, and one (Instagram) is duplicated across two files.
 
 ## License
 

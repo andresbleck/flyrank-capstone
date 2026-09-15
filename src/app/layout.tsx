@@ -1,17 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Changa_One, Baloo_2 } from "next/font/google";
+import { Changa_One, Baloo_2 } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const changaOne = Changa_One({
   weight: "400",
@@ -38,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${changaOne.variable} ${baloo2.variable} h-full antialiased`}
+      className={`${changaOne.variable} ${baloo2.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <a

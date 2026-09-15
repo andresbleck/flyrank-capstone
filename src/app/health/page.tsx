@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Health Check",
+  description:
+    "Server-side data fetching check: renders a live third-party response, or a failure message when it can't be reached.",
+};
+
 type Post = {
   id: number;
   title: string;

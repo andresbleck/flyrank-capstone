@@ -1,28 +1,13 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* The app renders on a fixed dark palette (every section paints its own
+   bg-neutral-800/900/950), so the body only needs a matching base to avoid a
+   light flash on overscroll or behind short pages. #0a0a0a is neutral-950.
+   Typography comes from the Changa One / Baloo 2 variables set in layout.tsx;
+   the rest inherits Tailwind's default sans stack. */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #0a0a0a;
+  color: #ededed;
 }
 
 @keyframes shutter-fade-blur {

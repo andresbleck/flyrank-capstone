@@ -12,10 +12,13 @@ Build a portfolio that demonstrates my ability to transform client ideas into si
 
 Always use the latest stable versions of:
 
+- Next.js (App Router)
 - React
 - TypeScript
 - Tailwind CSS
-- Vite
+- React Hook Form + Zod (forms and validation)
+- Vitest + Testing Library (unit and component tests)
+- Playwright (end-to-end tests)
 
 Unless I explicitly ask otherwise.
 
